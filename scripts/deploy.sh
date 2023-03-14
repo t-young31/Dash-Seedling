@@ -26,5 +26,5 @@ echo "Logging into an azure container registry"
 echo "${ACR_PASSWORD}" | docker login "${ACR_NAME}.azurecr.io" --username "${ACR_USERNAME}" --password-stdin
 docker tag "${LOCAL_IMAGE_NAME}" "${REMOTE_IMAGE_FULL_TAG}"
 
-echo "Pushing container: ${REMOTE_IMAGE_NAME}"
+echo "Pushing container: ${REMOTE_IMAGE_FULL_TAG}"
 docker push "${REMOTE_IMAGE_FULL_TAG}"

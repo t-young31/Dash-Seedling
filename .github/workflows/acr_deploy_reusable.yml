@@ -44,7 +44,7 @@ jobs:
         run: |
           if [ ${{ secrets.ARM_CLIENT_ID }} != "" ]; then
             echo "Have a service principal. Will tag image with commit SHA"
-            tag=${{ github.sha }}"
+            tag="${{ github.sha }}"
           else
             echo "No service principal. Tagging with latest and assuming webhook"
             tag="latest"
@@ -69,23 +69,17 @@ jobs:
           DOCKER_BUILDKIT: 1 
         run: make deploy
 
-  update-webapp-image-tag:
-    runs-on: ubuntu-latest
-    environment: ${{ inputs.environment }}
-    needs: [build-and-deploy]
-    if: needs.build-and-deploy.outputs.image_tag != 'latest'
-
-    steps:
-
       - name: Azure login
+        if: steps.set.outputs.tag != 'latest'
         uses: azure/login@v1
         with:
           creds: '{"clientId":"${{ secrets.ARM_CLIENT_ID }}","clientSecret":"${{ secrets.ARM_CLIENT_SECRET }}","subscriptionId":"${{ secrets.ARM_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.ARM_TENANT_ID }}"}'
       
       - name: Bump webapp image tag
+        if: steps.set.outputs.tag != 'latest'
         run: |
           az webapp config container set \
-            --docker-custom-image-name ${{ needs.build-and-deploy.outputs.remote_image_full_tag }} \
+            --docker-custom-image-name ${{ steps.set.outputs.remote_image_full_tag }} \
             --docker-registry-server-user ${{ secrets.ACR_USERNAME }} \
             --docker-registry-server-password ${{ secrets.ACR_PASSWORD }} \
             --docker-registry-server-url https://${{ secrets.ACR_NAME }}.azurecr.io \
