@@ -29,14 +29,13 @@ on:
         required: false
       WEBAPP_ID:
         required: false
+      SLOT_NAME:
+        required: false
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     environment: ${{ inputs.environment }}
-    outputs:
-      image_tag: ${{ steps.set.outputs.tag }}
-      remote_image_full_tag: ${{ steps.set.outputs.remote_image_full_tag }}
 
     steps:
       - name: Set image tag
